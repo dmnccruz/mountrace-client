@@ -490,6 +490,20 @@ img {
     width: 500px!important;
 }
 
+.newLogo {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    padding-left: 50px;
+    padding-top: 25px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.newLogo a{
+    pointer-events: all;
+    z-index: 2;
+}
 
 /* forms  */
 
