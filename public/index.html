@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>Mountrace | Screening App</title>
+  </head>
+  <body>
+
+    <div id="root"></div>
+
+    <script>
+      function getReverseGeocodingData(lat, lng) {
+        var latlng = new google.maps.LatLng(lat, lng);
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ 'latLng': latlng }, function (results, status) {
+            if (status !== google.maps.GeocoderStatus.OK) {
+                alert(status);
+            }
+            if (status == google.maps.GeocoderStatus.OK) {
+                document.getElementById('address2').value=(results[0].formatted_address);
+            }
+        });
+      }
+
+      function initMap() {
+        // var myLatLng = {lat: 14.5526503, lng: 121.0323753};
+        var myLatLng = {lat: 12.8797, lng: 121.7740};
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 6,
+            center: myLatLng,
+            styles: [
+                {
+                    "stylers": [
+                        {
+                            "visibility": "on"
+                        },
+                        {
+                            "saturation": -100
+                        },
+                        {
+                            "gamma": 0.54
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.icon",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "stylers": [
+                        {
+                            "color": "#6c8e87"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "labels.icon",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "labels.text",
+                    "stylers": [
+                        {
+                            "visibility": "simplified"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry.fill",
+                    "stylers": [
+                        {
+                            "color": "#ffffff"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.local",
+                    "elementType": "labels.text",
+                    "stylers": [
+                        {
+                            "visibility": "simplified"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#b4ede1"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit.line",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "gamma": 0.48
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit.station",
+                    "elementType": "labels.icon",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry.stroke",
+                    "stylers": [
+                        {
+                            "gamma": 7.18
+                        }
+                    ]
+                }
+            ]
+        });
+
+        var autocomplete;
+          autocomplete = new google.maps.places.Autocomplete((document.getElementById('address2')),);
+          google.maps.event.addListener(autocomplete, 'place_changed', function() {
+        });
+
+        var center = new google.maps.LatLng(12.8797, 121.7740);
+        var circle = new google.maps.Circle({
+            center: center,
+            radius: 500
+        });
+        autocomplete.setBounds(circle.getBounds());
+                
+        var geocoder = new google.maps.Geocoder();
+        var marker2 = new google.maps.Marker
+
+        document.getElementById('verify').addEventListener('click', function() {
+            geocodeAddress(geocoder, map);
+            document.getElementById('address2').disabled = true;
+            document.getElementById('verify').style.opacity = ".5";
+            document.getElementById('verify').style.pointerEvents = "none";
+        });
+
+        // document.getElementById('submit').addEventListener('click', function() {
+        //     geocodeAddress2(geocoder, map);
+        // });
+
+          function geocodeAddress(geocoder, resultsMap) {
+
+          var address = document.getElementById('address2').value;
+
+          geocoder.geocode({'address': address}, function(results, status) {
+              if (status === 'OK') {
+              resultsMap.setCenter(results[0].geometry.location);
+              resultsMap.setZoom(18);
+
+              // const lngInfo = document.getElementById('lngInfo')
+              // latInfo.innerHTML = "Latitude: " + results[0].geometry.location.lat()
+              // lngInfo.innerHTML = "Longitude: " + results[0].geometry.location.lng()
+
+              localStorage.setItem("address", JSON.stringify(results[0].geometry.location))
+
+              // localStorage.setItem(results[0].geometry.location, "address")
+
+              // console.log(results[0].geometry.location)
+              marker2 = new google.maps.Marker({
+                  map: resultsMap,
+                  position: results[0].geometry.location,
+                  // draggable: true,
+                  draggable: false,
+                  animation: google.maps.Animation.DROP,
+                  // icon: "/assets/images/publicmarker.png",
+                  zoom: 20
+              });
+
+              var infowindow = new google.maps.InfoWindow();
+              infowindow.setContent("Name: " + document.getElementById('firstName').value + " " + document.getElementById('lastName').value + "<br />" + "Email: " + document.getElementById('email').getAttribute('placeholder') + "<br />" + "Address: " + document.getElementById('address1').value.split("&")[0]);
+              infowindow.open(map,marker2);
+
+              // google.maps.event.addListener(marker2, 'dragend', function (evt) {
+              //     // latInfo.innerHTML = "Latitude: " + evt.latLng.lat().toFixed(7)
+              //     // lngInfo.innerHTML = "Longitude: " + evt.latLng.lng().toFixed(7)
+
+              //     getReverseGeocodingData(evt.latLng.lat().toFixed(7), evt.latLng.lng().toFixed(7))
+              //     event.preventDefault()
+              // }); 
+
+              } 
+              else {
+              alert('Address field blank or Address does not exist');
+              }
+          });
+        }
+      }
+    </script>
+
+
+
+<script>
+
+function initMap2() {
+    // var myLatLng = {lat: 14.5526503, lng: 121.0323753};
+    var myLatLng = {lat: 12.8797, lng: 121.7740};
+
+    var map = new google.maps.Map(document.getElementById('adminMap'), {
+        zoom: 7,
+        center: myLatLng,
+        styles: [
+        {
+            "featureType": "all",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "lightness": "29"
+                },
+                {
+                    "invert_lightness": true
+                },
+                {
+                    "hue": "#008fff"
+                },
+                {
+                    "saturation": "-73"
+                }
+            ]
+        },
+        {
+            "featureType": "all",
+            "elementType": "labels",
+            "stylers": [
+                {
+                    "saturation": "-72"
+                }
+            ]
+        },
+        {
+            "featureType": "administrative",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "lightness": "32"
+                },
+                {
+                    "weight": "0.42"
+                }
+            ]
+        },
+        {
+            "featureType": "administrative",
+            "elementType": "labels",
+            "stylers": [
+                {
+                    "visibility": "on"
+                },
+                {
+                    "lightness": "-53"
+                },
+                {
+                    "saturation": "-66"
+                }
+            ]
+        },
+        {
+            "featureType": "landscape",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "lightness": "-86"
+                },
+                {
+                    "gamma": "1.13"
+                }
+            ]
+        },
+        {
+            "featureType": "landscape",
+            "elementType": "geometry.fill",
+            "stylers": [
+                {
+                    "hue": "#006dff"
+                },
+                {
+                    "lightness": "4"
+                },
+                {
+                    "gamma": "1.44"
+                },
+                {
+                    "saturation": "-67"
+                }
+            ]
+        },
+        {
+            "featureType": "landscape",
+            "elementType": "geometry.stroke",
+            "stylers": [
+                {
+                    "lightness": "5"
+                }
+            ]
+        },
+        {
+            "featureType": "landscape",
+            "elementType": "labels.text.fill",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "poi",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "poi",
+            "elementType": "labels.text.fill",
+            "stylers": [
+                {
+                    "weight": "0.84"
+                },
+                {
+                    "gamma": "0.5"
+                }
+            ]
+        },
+        {
+            "featureType": "poi",
+            "elementType": "labels.text.stroke",
+            "stylers": [
+                {
+                    "visibility": "off"
+                },
+                {
+                    "weight": "0.79"
+                },
+                {
+                    "gamma": "0.5"
+                }
+            ]
+        },
+        {
+            "featureType": "road",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "visibility": "simplified"
+                },
+                {
+                    "lightness": "-78"
+                },
+                {
+                    "saturation": "-91"
+                }
+            ]
+        },
+        {
+            "featureType": "road",
+            "elementType": "labels.text",
+            "stylers": [
+                {
+                    "color": "#ffffff"
+                },
+                {
+                    "lightness": "-69"
+                }
+            ]
+        },
+        {
+            "featureType": "road.highway",
+            "elementType": "geometry.fill",
+            "stylers": [
+                {
+                    "lightness": "5"
+                }
+            ]
+        },
+        {
+            "featureType": "road.arterial",
+            "elementType": "geometry.fill",
+            "stylers": [
+                {
+                    "lightness": "10"
+                },
+                {
+                    "gamma": "1"
+                }
+            ]
+        },
+        {
+            "featureType": "road.local",
+            "elementType": "geometry.fill",
+            "stylers": [
+                {
+                    "lightness": "10"
+                },
+                {
+                    "saturation": "-100"
+                }
+            ]
+        },
+        {
+            "featureType": "transit",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "lightness": "-35"
+                }
+            ]
+        },
+        {
+            "featureType": "transit",
+            "elementType": "labels.text.stroke",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "water",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "saturation": "-5"
+                },
+                {
+                    "lightness": "10"
+                }
+            ]
+        }
+    ]
+    
+});
+
+var i;
+
+for(i=0; i < localStorage.length; i++){
+    if(localStorage.getItem(localStorage.key([i])).includes("adminAddress")) {
+        var infowindow2 = new google.maps.InfoWindow();
+        if(localStorage.getItem(localStorage.key([i])).split("&")[7] === "pui") {
+            var color = "./red.png"
+        }
+        else if(localStorage.getItem(localStorage.key([i])).split("&")[7] === "pum") {
+            var color = "./yellow.png"
+        }
+        else {
+            var color = "./green.png"
+        }
+
+            var marker = new google.maps.Marker({
+                position: JSON.parse(localStorage.key(i)),
+                map: map,
+                animation: google.maps.Animation.DROP,
+                icon: color
+            });
+
+            infowindow2.setContent( "Name: " + localStorage.getItem(localStorage.key([i])).split("&")[1] + "<br />" + "Address: " + localStorage.getItem(localStorage.key([i])).split("&")[2] + "<br />" + "Temp: " + localStorage.getItem(localStorage.key([i])).split("&")[4] + "<br />" + "Travelled?: " + localStorage.getItem(localStorage.key([i])).split("&")[5] + "<br />" + "Symptoms/Exposure: " + localStorage.getItem(localStorage.key([i])).split("&")[6]  + "<br />" + "Status: " + localStorage.getItem(localStorage.key([i])).split("&")[7])
+            infowindow2.open(map,marker);
+        }
+            
+    }
+}
+
+
+
+
+</script>
+
+  
+  </body>
+</html>
