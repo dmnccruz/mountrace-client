@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 
 import { useForm } from '../util/hooks'
-import { FETCH_SCREENS_QUERY, FETCH_USERS_QUERY } from '../util/graphql';
+import { FETCH_SCREENS_QUERY } from '../util/graphql';
 
 function ScreeningForm() {
     const { user } = useContext(AuthContext);
