@@ -9,7 +9,7 @@ export default function AppNavBar(){
         // <Navbar collapseOnSelect expand="lg" bg="transparent">
         <Navbar expand="lg" bg="transparent" variant="dark">
             <Navbar.Brand href="/">
-                <img alt="" src={ Logo } className="logo-resize"/>
+                <img alt="asd" src={ Logo } className="logo-resize"/>
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
